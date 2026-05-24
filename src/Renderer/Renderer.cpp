@@ -12,7 +12,7 @@ Renderer::Renderer(std::shared_ptr<Window> window)
 {
     m_Window = window;
 
-    m_Model.Init("assets/meshes/pistol/service_pistol_1k.gltf");
+    m_Model.Init("assets/meshes/car/covered_car.gltf");
     m_Skybox.Init("assets/skybox/1.hdr");
 
     m_Fb.Init(window->GetWindowInfo().width, window->GetWindowInfo().height);
