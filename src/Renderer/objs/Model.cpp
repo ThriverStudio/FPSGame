@@ -65,7 +65,7 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene, glm::mat4 transform)
 {
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
-    std::string diffuseTexture = "";
+    MeshMaterial mat;
 
     for (uint32_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -98,13 +98,16 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene, glm::mat4 transform)
     if (mesh->mMaterialIndex >= 0)
     {
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-        std::vector<std::string> textures = GetMaterialTextures(material, aiTextureType_DIFFUSE); // Only diffuse textures for now
-        
-        if (!textures.empty())
+        std::vector<std::string> diffuse = GetMaterialTextures(material, aiTextureType_DIFFUSE);
+        std::vector<std::string> normals = GetMaterialTextures(material, aiTextureType_NORMALS);
+        std::vector<std::string> metalness = GetMaterialTextures(material, aiTextureType_METALNESS);
+        std::vector<std::string> roughness = GetMaterialTextures(material, aiTextureType_DIFFUSE_ROUGHNESS);
+
+        if (!diffuse.empty())
         {
-            if(m_Textures.count(textures[0]) == 0) {
+            if(m_Textures.count(diffuse[0]) == 0) {
                 int width, height, channels;
-                auto* data = stbi_load(textures[0].c_str(), &width, &height, &channels, 4);
+                auto* data = stbi_load(diffuse[0].c_str(), &width, &height, &channels, 4);
                 if(!data)
                 {
                     FATAL("Failed to load model texture. Reason by stb image :- " + std::string(stbi_failure_reason()))
@@ -112,15 +115,66 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene, glm::mat4 transform)
 
                 Texture texture;
                 texture.Init(width, height, data);
-                m_Textures[textures[0]] = texture;
+                m_Textures[diffuse[0]] = texture;
                 stbi_image_free(data);
             }
-            diffuseTexture = textures[0];
+            mat.diffusePath = diffuse[0];
+        }
+        if (!normals.empty())
+        {
+            if(m_Textures.count(normals[0]) == 0) {
+                int width, height, channels;
+                auto* data = stbi_load(normals[0].c_str(), &width, &height, &channels, 4);
+                if(!data)
+                {
+                    FATAL("Failed to load model texture. Reason by stb image :- " + std::string(stbi_failure_reason()))
+                }
+
+                Texture texture;
+                texture.Init(width, height, data);
+                m_Textures[normals[0]] = texture;
+                stbi_image_free(data);
+            }
+            mat.normalPath = normals[0];
+        }
+        if (!metalness.empty())
+        {
+            if(m_Textures.count(metalness[0]) == 0) {
+                int width, height, channels;
+                auto* data = stbi_load(metalness[0].c_str(), &width, &height, &channels, 4);
+                if(!data)
+                {
+                    FATAL("Failed to load model texture. Reason by stb image :- " + std::string(stbi_failure_reason()))
+                }
+
+                Texture texture;
+                texture.Init(width, height, data);
+                m_Textures[metalness[0]] = texture;
+                stbi_image_free(data);
+            }
+            mat.metallicPath = metalness[0];
+        }
+        if (!roughness.empty())
+        {
+            if(m_Textures.count(roughness[0]) == 0) {
+                int width, height, channels;
+                auto* data = stbi_load(roughness[0].c_str(), &width, &height, &channels, 4);
+                if(!data)
+                {
+                    FATAL("Failed to load model texture. Reason by stb image :- " + std::string(stbi_failure_reason()))
+                }
+
+                Texture texture;
+                texture.Init(width, height, data);
+                m_Textures[roughness[0]] = texture;
+                stbi_image_free(data);
+            }
+            mat.roughnessPath = roughness[0];
         }
     }
 
     Mesh newMesh;
-    newMesh.Init(vertices, indices, diffuseTexture, m_Textures, std::move(transform));
+    newMesh.Init(vertices, indices, mat, m_Textures, std::move(transform));
     return newMesh;
 }
 
