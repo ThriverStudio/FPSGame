@@ -51,8 +51,6 @@ void Texture::Init(int32_t width, int32_t height, void* pixels, bool isDepth, bo
 void Texture::Destroy()
 {
     glDeleteTextures(1, &m_Handle);
-    if(m_Pixels)
-        delete[] (float*)m_Pixels;
 }
 
 void Texture::Resize(int32_t width, int32_t height)

@@ -2,6 +2,7 @@
 
 #include "Window/Input.h"
 #include "Utils.h"
+#include <thread>
 
 Application::Application()
 {
