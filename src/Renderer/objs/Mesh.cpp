@@ -58,6 +58,12 @@ void Mesh::Render()
         texture->Active(1);
         texture->Bind();
     }
+    texture = &(*m_TextureList)[m_Material.normalPath];
+    if (texture)
+    {
+        texture->Active(2);
+        texture->Bind();
+    }
 
     glBindVertexArray(m_Vao);
     glDrawElements(GL_TRIANGLES, m_VertCount, GL_UNSIGNED_INT, 0);
